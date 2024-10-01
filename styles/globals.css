@@ -124,7 +124,11 @@
   justify-self: center;
   animation: profile 8s ease-in-out infinite 1s;
 }
-
+.as-img {
+  aspect-ratio: 1;
+  object-fit: cover;
+  object-position: top;
+}
 @keyframes profile {
   0% {
     border-radius: 60% 40% 30% 70%/60% 30% 70% 40%;
@@ -139,4 +143,53 @@
 
 body {
   scroll-behavior: smooth;
+}
+/* cursor */
+/* General cursor styles */
+/* .mf-cursor.-pointer:not(.-text) {
+  mix-blend-mode: screen;
+} */
+
+.mf-cursor:before {
+  @apply scale-[0.55];
+}
+
+/* Apply different colors for light and dark mode */
+.mf-cursor.-text:before,
+.mf-cursor.-text.-active:before,
+.mf-cursor.-pointer:before {
+  @apply scale-[.3];
+}
+
+/* Reverse color styles for light and dark modes */
+.mf-cursor:before {
+  @apply rounded-full;
+  background-color: #000000; /* Default for light mode */
+  border: 2px solid #ffffff; /* Default border for light mode */
+}
+
+/* In dark mode, make the cursor light */
+.dark .mf-cursor:before {
+  background-color: #ffffff; /* Light background for dark mode */
+  border: 2px solid #000000; /* Dark border for dark mode */
+}
+
+.mf-cursor-text {
+  @apply font-mont p-2 text-[1.2rem] w-[100px] h-[100px] top-[-50px] left-[-50px];
+}
+
+.mf-cursor.-opacity:before {
+  @apply opacity-0 scale-[0.55];
+}
+
+body {
+  @apply cursor-none;
+}
+a,
+button,
+input,
+select,
+*,
+textarea {
+  cursor: none !important; /* Force cursor to be hidden */
 }

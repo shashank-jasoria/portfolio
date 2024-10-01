@@ -1,7 +1,7 @@
 import Image from "next/image";
 
 import MainLayout from "@/components/main-layout";
-import profilePic from "@/public/tour.png";
+import profilePic from "@/public/shashank.png";
 import NumberTicker from "@/components/ui/number-ticker";
 import GradualSpacing from "@/components/ui/gradual-spacing";
 import Skills from "@/components/skills";
@@ -46,7 +46,7 @@ const About = () => {
             <Image
               src={profilePic}
               alt="shashank"
-              className="w-full h-auto rounded-2xl"
+              className="w-full h-auto rounded-2xl as-img"
               priority={true}
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             />

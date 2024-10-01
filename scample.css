@@ -1,0 +1,85 @@
+.mf-cursor {
+  background-color: var(--cursor-bg); /* Use a variable for background color */
+  border: 2px solid var(--cursor-border); /* Define border color */
+  border-radius: 50%; /* Make it circular */
+  transition: none; /* Disable transitions if needed */ /* Default height */
+  z-index: 9999;
+}
+
+.mf-cursor-text {
+  font-family: var(--font-mont);
+  color: var(--cursor-text); /* Text color inside cursor */
+  padding: 2px; /* Padding inside the cursor */
+  font-size: 1.2rem; /* Font size for text inside cursor */
+
+  /* Increase width and height to make the cursor larger */
+  width: 120px; /* New width */
+  height: 120px; /* New height */
+
+  /* Positioning adjustments to keep the cursor centered */
+  top: -60px; /* Adjust based on new size */
+  left: -60px; /* Adjust based on new size */
+}
+
+.mf-cursor.-pointer:not(.-text) {
+  mix-blend-mode: screen; /* Keep existing style */
+}
+
+.mf-cursor:before {
+  @apply bg-accent scale-[0.55]; /* Adjust background */
+}
+
+.mf-cursor.-text:before,
+.mf-cursor.-text.-active:before,
+.mf-cursor.-pointer:before {
+  @apply opacity-100 bg-accent scale-[2.3]; /* Keep existing style */
+}
+
+.mf-cursor.-opacity:before {
+  @apply opacity-0 scale-[0.55]; /* Keep existing style */
+}
+
+/* ////// make it small removes hover effect and fixes color */
+/* cursor */
+/* General cursor styles */
+/* Base cursor styling */
+.mf-cursor {
+  background-color: var(--cursor-bg); /* Variable for background color */
+  border: 5px solid var(--cursor-border); /* Set the border */
+  border-radius: 50%; /* Circular cursor */
+  transition: none; /* Disable transitions */
+  font-size: 60px;
+}
+
+/* Light mode cursor settings */
+body.light .mf-cursor {
+  --cursor-bg: #000; /* Black background in light mode */
+  --cursor-border: #000; /* Black border in light mode */
+  transform: scale(3);
+}
+
+/* Dark mode cursor settings */
+body.dark .mf-cursor {
+  --cursor-bg: #fff; /* White background in dark mode */
+  --cursor-border: #fff; /* White border in dark mode */
+}
+
+/* Ensure no scaling or color change on hover */
+.mf-cursor.-pointer:hover,
+.mf-cursor.-text:hover {
+  transform: none; /* Disable any scaling */
+  background-color: var(--cursor-bg); /* Keep background consistent */
+  border-color: var(--cursor-border); /* Keep border consistent */
+}
+
+body {
+  @apply cursor-none;
+}
+a,
+button,
+input,
+select,
+textarea,
+div {
+  cursor: none !important; /* Force cursor to be hidden */
+}

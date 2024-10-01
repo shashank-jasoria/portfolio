@@ -1,5 +1,6 @@
 import IMG1 from "@/public/cabin-erp.png";
 import IMG2 from "@/public/cabin-booking.png";
+import IMG3 from "@/public/portf.png";
 import IMG4 from "@/public/worldwise.png";
 import IMG5 from "@/public/usepopcorn.png";
 import IMG6 from "@/public/recipe.png";
@@ -31,7 +32,7 @@ export const projects = [
     id: 3,
     title: "Portfolio",
     des: "I used Next.js to create a fast, SEO-friendly, and highly scalable web application. Leveraging Framer Motion and GSAP, I implemented smooth, captivating animations that bring the design to life, enhancing user engagement. The portfolio is a showcase of both technical skills and creativity, with a focus on performance and interactivity. Each section transitions seamlessly, reflecting the same level of attention to detail that I apply to all my projects.",
-    img: IMG2,
+    img: IMG3,
     iconLists: ["/next.svg", "/tail.svg", "/ts.svg", "/gsap.svg", "/fm.svg"],
     link: "https://shashankjasoria.com",
     tag: "Next.js",

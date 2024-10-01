@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Download } from "lucide-react";
 
 import MainLayout from "@/components/main-layout";
-import profilePic from "@/public/tour.png";
+import profilePic from "@/public/shashank.png";
 import AnimatedText from "@/components/animation/animated-text";
 import HireMe from "@/components/hire-me";
 import { SocialIcons } from "@/components/social-icons";
@@ -18,7 +18,7 @@ const Hero = () => {
             <Image
               src={profilePic}
               alt="profile-pic"
-              className="profilePic border-8 border-dark dark:border-light"
+              className="profilePic border-8 border-dark dark:border-light as-img"
               priority={true}
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 50vw"
             />

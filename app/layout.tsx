@@ -3,6 +3,7 @@ import { Montserrat } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { SessionProvider } from "next-auth/react";
 import { Toaster } from "sonner";
+import MouseFollowerComponent from "@/components/MouseFollower";
 
 import "@/styles/globals.css";
 import { ThemeProvider } from "@/hooks/theme-provider";
@@ -58,15 +59,17 @@ export default async function RootLayout({
       <body
         className={`${montserrat.className} font-mont bg-light w-full min-h-screen dark:bg-dark`}
       >
-        <SessionProvider>
-          <ThemeProvider attribute="class">
-            <Toaster />
-            <Navbar />
-            <Providers>{children}</Providers>
-            <Footer />
-            <SpeedInsights />
-          </ThemeProvider>
-        </SessionProvider>
+        <MouseFollowerComponent>
+          <SessionProvider>
+            <ThemeProvider attribute="class">
+              <Toaster />
+              <Navbar />
+              <Providers>{children}</Providers>
+              <Footer />
+              <SpeedInsights />
+            </ThemeProvider>
+          </SessionProvider>
+        </MouseFollowerComponent>
       </body>
     </html>
   );
