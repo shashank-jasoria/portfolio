@@ -1,7 +1,8 @@
 import Link from "next/link";
 import React from "react";
 import { SiGithub, SiLinkedin } from "react-icons/si";
-import { RiTwitterXFill } from "react-icons/ri";
+// import { RiTwitterXFill } from "react-icons/ri";
+import { SiCodepen } from "react-icons/si";
 
 import { Dock, DockIcon } from "@/components/ui/dock";
 
@@ -22,6 +23,11 @@ export function SocialIcons() {
           target="_blank"
         >
           <SiLinkedin className="h-6 w-6" />
+        </Link>
+      </DockIcon>
+      <DockIcon>
+        <Link href="https://codepen.io/shashankjasoria" target="_blank">
+          <SiCodepen className="h-6 w-6" />
         </Link>
       </DockIcon>
     </Dock>

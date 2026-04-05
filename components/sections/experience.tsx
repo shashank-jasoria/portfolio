@@ -6,6 +6,7 @@ import { motion, useScroll } from "framer-motion";
 import LiIcon from "@/components/li-icon";
 import MainLayout from "@/components/main-layout";
 import GradualSpacing from "@/components/ui/gradual-spacing";
+import work from "@/components/data/work"; 
 
 interface DetailsProps {
   position: string;
@@ -16,6 +17,8 @@ interface DetailsProps {
 }
 
 const Details = ({ position, company, time, address, work }: DetailsProps) => {
+
+
   const ref = useRef(null);
   return (
     <li
@@ -45,11 +48,20 @@ const Details = ({ position, company, time, address, work }: DetailsProps) => {
 };
 
 const Experience = () => {
+  
+
   const ref = useRef(null);
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start end", "center start"],
   });
+  const formatDate = (date: string) => {
+    const d = new Date(date);
+    return d.toLocaleString("en-US", {
+      month: "short",
+      year: "numeric",
+    });
+  };
 
   return (
     <section
@@ -70,38 +82,18 @@ const Experience = () => {
           />
 
           <ul className="w-full flex flex-col items-center justify-between ml-2 sm:ml-4">
-            <Details
-              position="Intern Frontend Developer"
-              company="MediaMonks"
-              time="Jun/2019 - Sept/2019"
-              address="Remote"
-              work="In my role as a front-end developer i developed responsive and cross-browser compatible front-end code for high-traffic websites proactively researched 3rd party libraries to avoid technical debt and refactored code to adhere to best practices, engaged in code reviews and provided constructive feedback to enhance team productivity"
-            />
-
-            <Details
-              position="UI Developer"
-              company="TOK"
-              time="Jan/2022 - Sep/2021"
-              address="Jaipur"
-              work="As a UI Developer at TOK, I was responsible for designing and implementing user-friendly, responsive interfaces for web applications. I collaborated with cross-functional teams to translate design concepts into high-quality code, ensuring seamless functionality and aesthetics. By focusing on performance optimization and troubleshooting, I enhanced the user experience across multiple devices and platforms, improving both usability and visual appeal."
-            />
-
-            <Details
-              position="Frontend Developer"
-              company="Build with Innovation"
-              time="Dec/2021 - Dec/2022"
-              address="Delhi, India"
-              work="In my recent at role at office Box, I specialized in crafting dynamic web applications using cutting-edge technologies like React, Redux, and Firebase, delivered high-quality, SEO-optimized front-end code for web applications, meeting client specifications and 
-            exceeding expectations, designed sleek and functional websites that ensured optimal user experience and client satisfaction."
-            />
-
-            <Details
-              position="Frontend Developer"
-              company="Farida Gupta"
-              time="Jan/2023 - Jul/2024"
-              address="Delhi, India"
-              work="At Farida Gupta, a product-based company, I contributed to developing and maintaining the front-end of a large-scale e-commerce platform. I focused on creating responsive, user-centric web pages, optimizing performance, and ensuring seamless integration with back-end systems. By working closely with the product and design teams, I enhanced the overall user experience, streamlining navigation and improving website functionality for an efficient shopping journeyss."
-            />
+            {work.map((job, index) => (
+              <Details
+                key={index}
+                position={job.position}
+                company={job.name}
+                time={`${formatDate(job.startDate)} - ${
+                  job.endDate ? formatDate(job.endDate) : "Present"
+                }`}
+                address="Delhi, India" // or add this in your data later
+                work={job.summary || ""}
+              />
+            ))}
           </ul>
         </div>
       </MainLayout>

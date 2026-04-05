@@ -72,14 +72,7 @@ const Education = () => {
           />
 
           <ul className="w-full flex flex-col items-center justify-between ml-2 sm:ml-4">
-            <Details
-              type="Commerce(Computer Science)"
-              // time="2018-2021"
-              place="St Xavier's Sr Sec School, Jaipur"
-              info="Learnt relevent knowledge regarding Web Developement & Design & Maintain School Website"
-              percentage="86%"
-            />
-
+            
             <Details
               type="Bachelor of Computer Application"
               // time="2023-present"

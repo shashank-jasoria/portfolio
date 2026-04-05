@@ -38,7 +38,6 @@ const ContactForm = () => {
   });
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log(values);
     if (formData.current) {
       emailjs.sendForm(
         "service_rg7g643",

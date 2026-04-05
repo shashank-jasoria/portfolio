@@ -1,0 +1,3511 @@
+@import-normalize;
+
+// Misc.
+$misc: (
+  z-index-base: 10000,
+);
+
+// Duration.
+$duration: (
+  menu: 0.5s,
+  transition: 0.2s,
+);
+
+// Size.
+$size: (
+  element-height: 2.75em,
+  element-margin: 2em,
+  section-spacing: 3em,
+  section-spacing-small: 1.5em,
+  menu: 25em,
+);
+
+// Font.
+$font: (
+  family: (
+    "Source Sans Pro",
+    Helvetica,
+    sans-serif,
+  ),
+  family-fixed: (
+    "Courier New",
+    monospace,
+  ),
+  family-heading: (
+    "Raleway",
+    Helvetica,
+    sans-serif,
+  ),
+  weight: 400,
+  weight-bold: 700,
+  weight-heading: 400,
+  weight-heading-bold: 800,
+  weight-heading-extrabold: 900,
+  kerning-heading: 0.25em,
+);
+
+// Palette.
+$palette: (
+  bg: #ffffff,
+  bg-alt: #f4f4f4,
+  fg: #646464,
+  fg-bold: #3c3b3b,
+  fg-light: #aaaaaa,
+  border: rgba(160, 160, 160, 0.3),
+  border-bg: rgba(160, 160, 160, 0.075),
+  border-alt: rgba(160, 160, 160, 0.65),
+  accent: #2e59ba,
+);
+
+/// Gets a duration value.
+/// @param {string} $keys Key(s).
+/// @return {string} Value.
+@function _duration($keys...) {
+  @return val($duration, $keys...);
+}
+
+/// Gets a font value.
+/// @param {string} $keys Key(s).
+/// @return {string} Value.
+@function _font($keys...) {
+  @return val($font, $keys...);
+}
+
+/// Gets a misc value.
+/// @param {string} $keys Key(s).
+/// @return {string} Value.
+@function _misc($keys...) {
+  @return val($misc, $keys...);
+}
+
+/// Gets a palette value.
+/// @param {string} $keys Key(s).
+/// @return {string} Value.
+@function _palette($keys...) {
+  @return val($palette, $keys...);
+}
+
+/// Gets a size value.
+/// @param {string} $keys Key(s).
+/// @return {string} Value.
+@function _size($keys...) {
+  @return val($size, $keys...);
+}
+
+// skel.scss v3.0.1 | (c) skel.io | MIT licensed */
+
+// Vars.
+
+/// Breakpoints.
+/// @var {list}
+$breakpoints: ();
+
+/// Vendor prefixes.
+/// @var {list}
+$vendor-prefixes: ("-moz-", "-webkit-", "-ms-", "");
+
+/// Properties that should be vendorized.
+/// @var {list}
+$vendor-properties: (
+  "align-content",
+  "align-items",
+  "align-self",
+  "animation",
+  "animation-delay",
+  "animation-direction",
+  "animation-duration",
+  "animation-fill-mode",
+  "animation-iteration-count",
+  "animation-name",
+  "animation-play-state",
+  "animation-timing-function",
+  "appearance",
+  "backface-visibility",
+  "box-sizing",
+  "filter",
+  "flex",
+  "flex-basis",
+  "flex-direction",
+  "flex-flow",
+  "flex-grow",
+  "flex-shrink",
+  "flex-wrap",
+  "justify-content",
+  "order",
+  "perspective",
+  "pointer-events",
+  "transform",
+  "transform-origin",
+  "transform-style",
+  "transition",
+  "transition-delay",
+  "transition-duration",
+  "transition-property",
+  "transition-timing-function",
+  "user-select"
+);
+
+/// Values that should be vendorized.
+/// @var {list}
+$vendor-values: (
+  "filter",
+  "flex",
+  "linear-gradient",
+  "radial-gradient",
+  "transform"
+);
+
+// Functions.
+
+/// Removes a specific item from a list.
+/// @author Hugo Giraudel
+/// @param {list} $list List.
+/// @param {integer} $index Index.
+/// @return {list} Updated list.
+@function remove-nth($list, $index) {
+  $result: null;
+
+  @if type-of($index) != number {
+    @warn "$index: #{quote($index)} is not a number for `remove-nth`.";
+  } @else if $index == 0 {
+    @warn "List index 0 must be a non-zero integer for `remove-nth`.";
+  } @else if abs($index) > length($list) {
+    @warn "List index is #{$index} but list is only #{length($list)} item long for `remove-nth`.";
+  } @else {
+    $result: ();
+    $index: if($index < 0, length($list) + $index + 1, $index);
+
+    @for $i from 1 through length($list) {
+      @if $i != $index {
+        $result: append($result, nth($list, $i));
+      }
+    }
+  }
+
+  @return $result;
+}
+
+/// Replaces a substring within another string.
+/// @author Hugo Giraudel
+/// @param {string} $string String.
+/// @param {string} $search Substring.
+/// @param {string} $replace Replacement.
+/// @return {string} Updated string.
+@function str-replace($string, $search, $replace: "") {
+  $index: str-index($string, $search);
+
+  @if $index {
+    @return str-slice($string, 1, $index - 1) + $replace +
+      str-replace(
+        str-slice($string, $index + str-length($search)),
+        $search,
+        $replace
+      );
+  }
+
+  @return $string;
+}
+
+/// Replaces a substring within each string in a list.
+/// @param {list} $strings List of strings.
+/// @param {string} $search Substring.
+/// @param {string} $replace Replacement.
+/// @return {list} Updated list of strings.
+@function str-replace-all($strings, $search, $replace: "") {
+  @each $string in $strings {
+    $strings: set-nth(
+      $strings,
+      index($strings, $string),
+      str-replace($string, $search, $replace)
+    );
+  }
+
+  @return $strings;
+}
+
+/// Gets a value from a map.
+/// @author Hugo Giraudel
+/// @param {map} $map Map.
+/// @param {string} $keys Key(s).
+/// @return {string} Value.
+@function val($map, $keys...) {
+  @if nth($keys, 1) == null {
+    $keys: remove-nth($keys, 1);
+  }
+
+  @each $key in $keys {
+    $map: map-get($map, $key);
+  }
+
+  @return $map;
+}
+
+// Mixins.
+
+/// Sets the global box model.
+/// @param {string} $model Model (default is content).
+@mixin boxModel($model: "content") {
+  $x: $model + "-box";
+
+  *,
+  *:before,
+  *:after {
+    -moz-box-sizing: #{$x};
+    -webkit-box-sizing: #{$x};
+    box-sizing: #{$x};
+  }
+}
+
+/// Wraps @content in a @media block using a given breakpoint.
+/// @param {string} $breakpoint Breakpoint.
+/// @param {map} $queries Additional queries.
+@mixin breakpoint($breakpoint: null, $queries: null) {
+  $query: "screen";
+
+  // Breakpoint.
+  @if $breakpoint and map-has-key($breakpoints, $breakpoint) {
+    $query: $query + " and " + map-get($breakpoints, $breakpoint);
+  }
+
+  // Queries.
+  @if $queries {
+    @each $k, $v in $queries {
+      $query: $query + " and (" + $k + ":" + $v + ")";
+    }
+  }
+
+  @media #{$query} {
+    @content;
+  }
+}
+
+/// Wraps @content in a @media block targeting a specific orientation.
+/// @param {string} $orientation Orientation.
+@mixin orientation($orientation) {
+  @media screen and (orientation: #{$orientation}) {
+    @content;
+  }
+}
+
+/// Utility mixin for containers.
+/// @param {mixed} $width Width.
+@mixin containers($width) {
+  // Locked?
+  $lock: false;
+
+  @if length($width) == 2 {
+    $width: nth($width, 1);
+    $lock: true;
+  }
+
+  // Modifiers.
+  .container.\31 25\25 {
+    width: 100%;
+    max-width: $width * 1.25;
+    min-width: $width;
+  }
+  .container.\37 5\25 {
+    width: $width * 0.75;
+  }
+  .container.\35 0\25 {
+    width: $width * 0.5;
+  }
+  .container.\32 5\25 {
+    width: $width * 0.25;
+  }
+
+  // Main class.
+  .container {
+    @if $lock {
+      width: $width !important;
+    } @else {
+      width: $width;
+    }
+  }
+}
+
+/// Utility mixin for grid.
+/// @param {list} $gutters Column and row gutters (default is 40px).
+/// @param {string} $breakpointName Optional breakpoint name.
+@mixin grid($gutters: 40px, $breakpointName: null) {
+  // Gutters.
+  @include grid-gutters($gutters);
+  @include grid-gutters($gutters, \32 00\25, 2);
+  @include grid-gutters($gutters, \31 50\25, 1.5);
+  @include grid-gutters($gutters, \35 0\25, 0.5);
+  @include grid-gutters($gutters, \32 5\25, 0.25);
+
+  // Cells.
+  $x: "";
+
+  @if $breakpointName {
+    $x: "\\28"+ $breakpointName + "\\29";
+  }
+
+  .\31 2u#{$x},
+  .\31 2u\24#{$x} {
+    width: 100%;
+    clear: none;
+    margin-left: 0;
+  }
+  .\31 1u#{$x},
+  .\31 1u\24#{$x} {
+    width: 91.6666666667%;
+    clear: none;
+    margin-left: 0;
+  }
+  .\31 0u#{$x},
+  .\31 0u\24#{$x} {
+    width: 83.3333333333%;
+    clear: none;
+    margin-left: 0;
+  }
+  .\39 u#{$x},
+  .\39 u\24#{$x} {
+    width: 75%;
+    clear: none;
+    margin-left: 0;
+  }
+  .\38 u#{$x},
+  .\38 u\24#{$x} {
+    width: 66.6666666667%;
+    clear: none;
+    margin-left: 0;
+  }
+  .\37 u#{$x},
+  .\37 u\24#{$x} {
+    width: 58.3333333333%;
+    clear: none;
+    margin-left: 0;
+  }
+  .\36 u#{$x},
+  .\36 u\24#{$x} {
+    width: 50%;
+    clear: none;
+    margin-left: 0;
+  }
+  .\35 u#{$x},
+  .\35 u\24#{$x} {
+    width: 41.6666666667%;
+    clear: none;
+    margin-left: 0;
+  }
+  .\34 u#{$x},
+  .\34 u\24#{$x} {
+    width: 33.3333333333%;
+    clear: none;
+    margin-left: 0;
+  }
+  .\33 u#{$x},
+  .\33 u\24#{$x} {
+    width: 25%;
+    clear: none;
+    margin-left: 0;
+  }
+  .\32 u#{$x},
+  .\32 u\24#{$x} {
+    width: 16.6666666667%;
+    clear: none;
+    margin-left: 0;
+  }
+  .\31 u#{$x},
+  .\31 u\24#{$x} {
+    width: 8.3333333333%;
+    clear: none;
+    margin-left: 0;
+  }
+
+  .\31 2u\24#{$x} + *,
+  .\31 1u\24#{$x} + *,
+  .\31 0u\24#{$x} + *,
+  .\39 u\24#{$x} + *,
+  .\38 u\24#{$x} + *,
+  .\37 u\24#{$x} + *,
+  .\36 u\24#{$x} + *,
+  .\35 u\24#{$x} + *,
+  .\34 u\24#{$x} + *,
+  .\33 u\24#{$x} + *,
+  .\32 u\24#{$x} + *,
+  .\31 u\24#{$x} + * {
+    clear: left;
+  }
+
+  .\-11u#{$x} {
+    margin-left: 91.6666666667%;
+  }
+  .\-10u#{$x} {
+    margin-left: 83.3333333333%;
+  }
+  .\-9u#{$x} {
+    margin-left: 75%;
+  }
+  .\-8u#{$x} {
+    margin-left: 66.6666666667%;
+  }
+  .\-7u#{$x} {
+    margin-left: 58.3333333333%;
+  }
+  .\-6u#{$x} {
+    margin-left: 50%;
+  }
+  .\-5u#{$x} {
+    margin-left: 41.6666666667%;
+  }
+  .\-4u#{$x} {
+    margin-left: 33.3333333333%;
+  }
+  .\-3u#{$x} {
+    margin-left: 25%;
+  }
+  .\-2u#{$x} {
+    margin-left: 16.6666666667%;
+  }
+  .\-1u#{$x} {
+    margin-left: 8.3333333333%;
+  }
+}
+
+/// Utility mixin for grid.
+/// @param {list} $gutters Gutters.
+/// @param {string} $class Optional class name.
+/// @param {integer} $multiplier Multiplier (default is 1).
+@mixin grid-gutters($gutters, $class: null, $multiplier: 1) {
+  // Expand gutters if it's not a list.
+  @if length($gutters) == 1 {
+    $gutters: ($gutters, 0);
+  }
+
+  // Get column and row gutter values.
+  $c: nth($gutters, 1);
+  $r: nth($gutters, 2);
+
+  // Get class (if provided).
+  $x: "";
+
+  @if $class {
+    $x: "." + $class;
+  }
+
+  // Default.
+  .row#{$x} > * {
+    padding: ($r * $multiplier) 0 0 ($c * $multiplier);
+  }
+  .row#{$x} {
+    margin: ($r * $multiplier * -1) 0 -1px ($c * $multiplier * -1);
+  }
+
+  // Uniform.
+  .row.uniform#{$x} > * {
+    padding: ($c * $multiplier) 0 0 ($c * $multiplier);
+  }
+  .row.uniform#{$x} {
+    margin: ($c * $multiplier * -1) 0 -1px ($c * $multiplier * -1);
+  }
+}
+
+/// Wraps @content in vendorized keyframe blocks.
+/// @param {string} $name Name.
+@mixin keyframes($name) {
+  @-moz-keyframes #{$name} {
+    @content;
+  }
+  @-webkit-keyframes #{$name} {
+    @content;
+  }
+  @-ms-keyframes #{$name} {
+    @content;
+  }
+  @keyframes #{$name} {
+    @content;
+  }
+}
+
+///
+/// Sets breakpoints.
+/// @param {map} $x Breakpoints.
+///
+@mixin skel-breakpoints($x: ()) {
+  $breakpoints: $x !global;
+}
+
+///
+/// Initializes layout module.
+/// @param {map} config Config.
+///
+@mixin skel-layout($config: ()) {
+  // Config.
+  $configPerBreakpoint: ();
+
+  $z: map-get($config, "breakpoints");
+
+  @if $z {
+    $configPerBreakpoint: $z;
+  }
+
+  // Reset.
+  $x: map-get($config, "reset");
+
+  @if $x {
+    /* Reset */
+
+    @include reset($x);
+  }
+
+  // Box model.
+  $x: map-get($config, "boxModel");
+
+  @if $x {
+    /* Box Model */
+
+    @include boxModel($x);
+  }
+
+  // Containers.
+  $containers: map-get($config, "containers");
+
+  @if $containers {
+    /* Containers */
+
+    .container {
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    // Use default is $containers is just "true".
+    @if $containers == true {
+      $containers: 960px;
+    }
+
+    // Apply base.
+    @include containers($containers);
+
+    // Apply per-breakpoint.
+    @each $name in map-keys($breakpoints) {
+      // Get/use breakpoint setting if it exists.
+      $x: map-get($configPerBreakpoint, $name);
+
+      // Per-breakpoint config exists?
+      @if $x {
+        $y: map-get($x, "containers");
+
+        // Setting exists? Use it.
+        @if $y {
+          $containers: $y;
+        }
+      }
+
+      // Create @media block.
+      @media screen and #{map-get($breakpoints, $name)} {
+        @include containers($containers);
+      }
+    }
+  }
+
+  // Grid.
+  $grid: map-get($config, "grid");
+
+  @if $grid {
+    /* Grid */
+
+    // Use defaults if $grid is just "true".
+    @if $grid == true {
+      $grid: ();
+    }
+
+    // Sub-setting: Gutters.
+    $grid-gutters: 40px;
+    $x: map-get($grid, "gutters");
+
+    @if $x {
+      $grid-gutters: $x;
+    }
+
+    // Rows.
+    .row {
+      border-bottom: solid 1px transparent;
+      -moz-box-sizing: border-box;
+      -webkit-box-sizing: border-box;
+      box-sizing: border-box;
+    }
+
+    .row > * {
+      float: left;
+      -moz-box-sizing: border-box;
+      -webkit-box-sizing: border-box;
+      box-sizing: border-box;
+    }
+
+    .row:after,
+    .row:before {
+      content: "";
+      display: block;
+      clear: both;
+      height: 0;
+    }
+
+    .row.uniform > * > :first-child {
+      margin-top: 0;
+    }
+
+    .row.uniform > * > :last-child {
+      margin-bottom: 0;
+    }
+
+    // Gutters (0%).
+    @include grid-gutters($grid-gutters, \30 \25, 0);
+
+    // Apply base.
+    @include grid($grid-gutters);
+
+    // Apply per-breakpoint.
+    @each $name in map-keys($breakpoints) {
+      // Get/use breakpoint setting if it exists.
+      $x: map-get($configPerBreakpoint, $name);
+
+      // Per-breakpoint config exists?
+      @if $x {
+        $y: map-get($x, "grid");
+
+        // Setting exists?
+        @if $y {
+          // Sub-setting: Gutters.
+          $x: map-get($y, "gutters");
+
+          @if $x {
+            $grid-gutters: $x;
+          }
+        }
+      }
+
+      // Create @media block.
+      @media screen and #{map-get($breakpoints, $name)} {
+        @include grid($grid-gutters, $name);
+      }
+    }
+  }
+}
+
+/// Resets browser styles.
+/// @param {string} $mode Mode (default is 'normalize').
+@mixin reset($mode: "normalize") {
+  @if $mode == "normalize" {
+    // normalize.css v3.0.2 | MIT License | git.io/normalize
+    html {
+      font-family: sans-serif;
+      -ms-text-size-adjust: 100%;
+      -webkit-text-size-adjust: 100%;
+    }
+    body {
+      margin: 0;
+    }
+    article,
+    aside,
+    details,
+    figcaption,
+    figure,
+    footer,
+    header,
+    hgroup,
+    main,
+    menu,
+    nav,
+    section,
+    summary {
+      display: block;
+    }
+    audio,
+    canvas,
+    progress,
+    video {
+      display: inline-block;
+      vertical-align: baseline;
+    }
+    audio:not([controls]) {
+      display: none;
+      height: 0;
+    }
+    [hidden],
+    template {
+      display: none;
+    }
+    a {
+      background-color: transparent;
+    }
+    a:active,
+    a:hover {
+      outline: 0;
+    }
+    abbr[title] {
+      border-bottom: 1px dotted;
+    }
+    b,
+    strong {
+      font-weight: 700;
+    }
+    dfn {
+      font-style: italic;
+    }
+    h1 {
+      font-size: 2em;
+      margin: 0.67em 0;
+    }
+    mark {
+      background: #ff0;
+      color: #000;
+    }
+    small {
+      font-size: 80%;
+    }
+    sub,
+    sup {
+      font-size: 75%;
+      line-height: 0;
+      position: relative;
+      vertical-align: baseline;
+    }
+    sup {
+      top: -0.5em;
+    }
+    sub {
+      bottom: -0.25em;
+    }
+    img {
+      border: 0;
+    }
+    svg:not(:root) {
+      overflow: hidden;
+    }
+    figure {
+      margin: 1em 40px;
+    }
+    hr {
+      -moz-box-sizing: content-box;
+      box-sizing: content-box;
+      height: 0;
+    }
+    pre {
+      overflow: auto;
+    }
+    code,
+    kbd,
+    pre,
+    samp {
+      font-family: monospace, monospace;
+      font-size: 1em;
+    }
+    button,
+    input,
+    optgroup,
+    select,
+    textarea {
+      color: inherit;
+      font: inherit;
+      margin: 0;
+    }
+    button {
+      overflow: visible;
+    }
+    button,
+    select {
+      text-transform: none;
+    }
+    button,
+    html input[type="button"],
+    input[type="reset"],
+    input[type="submit"] {
+      -webkit-appearance: button;
+      cursor: pointer;
+    }
+    button[disabled],
+    html input[disabled] {
+      cursor: default;
+    }
+    button::-moz-focus-inner,
+    input::-moz-focus-inner {
+      border: 0;
+      padding: 0;
+    }
+    input {
+      line-height: normal;
+    }
+    input[type="checkbox"],
+    input[type="radio"] {
+      box-sizing: border-box;
+      padding: 0;
+    }
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+      height: auto;
+    }
+    input[type="search"] {
+      -webkit-appearance: textfield;
+      -moz-box-sizing: content-box;
+      -webkit-box-sizing: content-box;
+      box-sizing: content-box;
+    }
+    input[type="search"]::-webkit-search-cancel-button,
+    input[type="search"]::-webkit-search-decoration {
+      -webkit-appearance: none;
+    }
+    fieldset {
+      border: 1px solid silver;
+      margin: 0 2px;
+      padding: 0.35em 0.625em 0.75em;
+    }
+    legend {
+      border: 0;
+      padding: 0;
+    }
+    textarea {
+      overflow: auto;
+    }
+    optgroup {
+      font-weight: 700;
+    }
+    table {
+      border-collapse: collapse;
+      border-spacing: 0;
+    }
+    td,
+    th {
+      padding: 0;
+    }
+  } @else if $mode == "full" {
+    // meyerweb.com/eric/tools/css/reset v2.0 | 20110126 | License: none (public domain)
+    html,
+    body,
+    div,
+    span,
+    applet,
+    object,
+    iframe,
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    p,
+    blockquote,
+    pre,
+    a,
+    abbr,
+    acronym,
+    address,
+    big,
+    cite,
+    code,
+    del,
+    dfn,
+    em,
+    img,
+    ins,
+    kbd,
+    q,
+    s,
+    samp,
+    small,
+    strike,
+    strong,
+    sub,
+    sup,
+    tt,
+    var,
+    b,
+    u,
+    i,
+    center,
+    dl,
+    dt,
+    dd,
+    ol,
+    ul,
+    li,
+    fieldset,
+    form,
+    label,
+    legend,
+    table,
+    caption,
+    tbody,
+    tfoot,
+    thead,
+    tr,
+    th,
+    td,
+    article,
+    aside,
+    canvas,
+    details,
+    embed,
+    figure,
+    figcaption,
+    footer,
+    header,
+    hgroup,
+    menu,
+    nav,
+    output,
+    ruby,
+    section,
+    summary,
+    time,
+    mark,
+    audio,
+    video {
+      margin: 0;
+      padding: 0;
+      border: 0;
+      font-size: 100%;
+      font: inherit;
+      vertical-align: baseline;
+    }
+    article,
+    aside,
+    details,
+    figcaption,
+    figure,
+    footer,
+    header,
+    hgroup,
+    menu,
+    nav,
+    section {
+      display: block;
+    }
+    body {
+      line-height: 1;
+    }
+    ol,
+    ul {
+      list-style: none;
+    }
+    blockquote,
+    q {
+      quotes: none;
+    }
+    blockquote:before,
+    blockquote:after,
+    q:before,
+    q:after {
+      content: "";
+      content: none;
+    }
+    table {
+      border-collapse: collapse;
+      border-spacing: 0;
+    }
+    body {
+      -webkit-text-size-adjust: none;
+    }
+  }
+}
+
+/// Vendorizes a declaration's property and/or value(s).
+/// @param {string} $property Property.
+/// @param {mixed} $value String/list of value(s).
+@mixin vendor($property, $value) {
+  // Determine if property should expand.
+  $expandProperty: index($vendor-properties, $property);
+
+  // Determine if value should expand (and if so, add '-prefix-' placeholder).
+  $expandValue: false;
+
+  @each $x in $value {
+    @each $y in $vendor-values {
+      @if $y == str-slice($x, 1, str-length($y)) {
+        $value: set-nth($value, index($value, $x), "-prefix-" + $x);
+        $expandValue: true;
+      }
+    }
+  }
+
+  // Expand property?
+  @if $expandProperty {
+    @each $vendor in $vendor-prefixes {
+      #{$vendor}#{$property}: #{str-replace-all($value, "-prefix-", $vendor)};
+    }
+  }
+
+  // Expand just the value?
+  @else if $expandValue {
+    @each $vendor in $vendor-prefixes {
+      #{$property}: #{str-replace-all($value, "-prefix-", $vendor)};
+    }
+  }
+
+  // Neither? Treat them as a normal declaration.
+  @else {
+    #{$property}: #{$value};
+  }
+}
+
+/// Makes an element's :before pseudoelement a FontAwesome icon.
+/// @param {string} $content Optional content value to use.
+/// @param {string} $where Optional pseudoelement to target (before or after).
+@mixin icon($content: false, $where: before) {
+  text-decoration: none;
+
+  &:#{$where} {
+    @if $content {
+      content: $content;
+    }
+
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    font-family: FontAwesome;
+    font-style: normal;
+    font-weight: normal;
+    text-transform: none !important;
+  }
+}
+
+/// Applies padding to an element, taking the current element-margin value into account.
+/// @param {mixed} $tb Top/bottom padding.
+/// @param {mixed} $lr Left/right padding.
+/// @param {list} $pad Optional extra padding (in the following order top, right, bottom, left)
+/// @param {bool} $important If true, adds !important.
+@mixin padding($tb, $lr, $pad: (0, 0, 0, 0), $important: null) {
+  @if $important {
+    $important: "!important";
+  }
+
+  padding: ($tb + nth($pad, 1)) ($lr + nth($pad, 2))
+    max(0.1em, $tb - _size(element-margin) + nth($pad, 3)) ($lr + nth($pad, 4))
+    #{$important};
+}
+
+/// Encodes a SVG data URL so IE doesn't choke (via codepen.io/jakob-e/pen/YXXBrp).
+/// @param {string} $svg SVG data URL.
+/// @return {string} Encoded SVG data URL.
+@function svg-url($svg) {
+  $svg: str-replace($svg, '"', "'");
+  $svg: str-replace($svg, "<", "%3C");
+  $svg: str-replace($svg, ">", "%3E");
+  $svg: str-replace($svg, "&", "%26");
+  $svg: str-replace($svg, "#", "%23");
+  $svg: str-replace($svg, "{", "%7B");
+  $svg: str-replace($svg, "}", "%7D");
+  $svg: str-replace($svg, ";", "%3B");
+
+  @return url("data:image/svg+xml;charset=utf8,#{$svg}");
+}
+
+// NOTE: This import was moved into index.html template
+// @import url('//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700|Raleway:400,800,900');
+
+/*
+	Future Imperfect by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+*/
+.cv_img {
+  aspect-ratio: 1;
+  object-fit: cover;
+  object-position: top;
+}
+article.jobs-container {
+  margin-bottom: 25px;
+}
+@include skel-breakpoints(
+  (
+    xlarge: "(max-width: 1680px)",
+    large: "(max-width: 1280px)",
+    medium: "(max-width: 980px)",
+    small: "(max-width: 736px)",
+    xsmall: "(max-width: 480px)",
+  )
+);
+
+@include skel-layout(
+  (
+    reset: "full",
+    boxModel: "border",
+    grid: (
+      gutters: 1em,
+    ),
+  )
+);
+
+// Base.
+.cv_view {
+  ///
+  /// Future Imperfect by HTML5 UP
+  /// html5up.net | @ajlkn
+  /// Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+  ///
+
+  /* Basic */
+
+  // MSIE: Required for IEMobile.
+  @-ms-viewport {
+    width: device-width;
+  }
+
+  // MSIE: Prevents scrollbar from overlapping content.
+  body {
+    -ms-overflow-style: scrollbar;
+  }
+
+  // Ensures page width is always >=320px.
+  @include breakpoint(xsmall) {
+    html,
+    body {
+      min-width: 320px;
+    }
+  }
+
+  body {
+    background: _palette(bg-alt) !important;
+
+    // Prevents animation/transition "flicker" on page load.
+    // Automatically added/removed by js/main.js.
+    &.is-loading {
+      *,
+      *:before,
+      *:after {
+        @include vendor("animation", "none !important");
+        @include vendor("transition", "none !important");
+      }
+    }
+  }
+
+  body,
+  input,
+  select,
+  textarea {
+    color: _palette(fg);
+    font-family: _font(family);
+    font-size: 14pt;
+    font-weight: _font(weight);
+    line-height: 1.75;
+
+    @include breakpoint(xlarge) {
+      font-size: 12pt;
+    }
+
+    @include breakpoint(large) {
+      font-size: 12pt;
+    }
+
+    @include breakpoint(medium) {
+      font-size: 12pt;
+    }
+
+    @include breakpoint(small) {
+      font-size: 12pt;
+    }
+
+    @include breakpoint(xsmall) {
+      font-size: 12pt;
+    }
+  }
+
+  a {
+    @include vendor(
+      "transition",
+      (
+        "color #{_duration(transition)} ease",
+        "border-bottom-color #{_duration(transition)} ease"
+      )
+    );
+    border-bottom: dotted 1px _palette(border-alt);
+    color: inherit;
+    text-decoration: none;
+
+    &:before {
+      @include vendor("transition", ("color #{_duration(transition)} ease"));
+    }
+
+    &:hover {
+      border-bottom-color: transparent;
+      color: _palette(accent) !important;
+
+      &:before {
+        color: _palette(accent) !important;
+      }
+    }
+  }
+
+  strong,
+  b {
+    color: _palette(fg-bold);
+    font-weight: _font(weight-bold);
+  }
+
+  em,
+  i {
+    font-style: italic;
+  }
+
+  p {
+    margin: 0 0 _size(element-margin) 0;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    color: _palette(fg-bold);
+    font-family: _font(family-heading);
+    font-weight: _font(weight-heading-bold);
+    letter-spacing: _font(kerning-heading);
+    line-height: 1.65;
+    margin: 0 0 (_size(element-margin) * 0.5) 0;
+    text-transform: uppercase;
+
+    a {
+      color: inherit;
+      border-bottom: 0;
+    }
+  }
+
+  h2 {
+    font-size: 1.1em;
+  }
+
+  h3 {
+    font-size: 0.9em;
+  }
+
+  h4 {
+    font-size: 0.7em;
+  }
+
+  h5 {
+    font-size: 0.7em;
+  }
+
+  h6 {
+    font-size: 0.7em;
+  }
+
+  sub {
+    font-size: 0.8em;
+    position: relative;
+    top: 0.5em;
+  }
+
+  sup {
+    font-size: 0.8em;
+    position: relative;
+    top: -0.5em;
+  }
+
+  blockquote {
+    border-left: solid 4px _palette(border);
+    font-style: italic;
+    margin: 0 0 _size(element-margin) 0;
+    padding: calc(_size(element-margin) / 4) 0 calc(_size(element-margin) / 4)
+      _size(element-margin);
+  }
+
+  code {
+    background: _palette(border-bg);
+    border: solid 1px _palette(border);
+    font-family: _font(family-fixed);
+    font-size: 0.9em;
+    margin: 0 0.25em;
+    padding: 0.25em 0.65em;
+  }
+
+  pre {
+    -webkit-overflow-scrolling: touch;
+    font-family: _font(family-fixed);
+    font-size: 0.9em;
+    margin: 0 0 _size(element-margin) 0;
+
+    code {
+      display: block;
+      line-height: 1.75em;
+      padding: 1em 1.5em;
+      overflow-x: auto;
+    }
+  }
+
+  hr {
+    border: 0;
+    border-bottom: solid 1px _palette(border);
+    margin: _size(element-margin) 0;
+
+    &.major {
+      margin: (_size(element-margin) * 1.5) 0;
+    }
+  }
+
+  .align-left {
+    text-align: left;
+  }
+
+  .align-center {
+    text-align: center;
+  }
+
+  .align-right {
+    text-align: right;
+  }
+
+  .author {
+    @include vendor("display", "flex");
+    @include vendor("flex-direction", "row");
+    @include vendor("align-items", "center");
+    @include vendor("justify-content", "flex-end");
+    border-bottom: 0;
+    font-family: _font(family-heading);
+    font-size: 0.6em;
+    font-weight: _font(weight-heading);
+    letter-spacing: _font(kerning-heading);
+    text-transform: uppercase;
+    white-space: nowrap;
+
+    .name {
+      @include vendor(
+        "transition",
+        "border-bottom-color #{_duration(transition)} ease"
+      );
+      border-bottom: dotted 1px _palette(border-alt);
+      display: block;
+      margin: 0 1.5em 0 0;
+    }
+
+    img {
+      border-radius: 100%;
+      display: block;
+      width: 4em;
+    }
+
+    &:hover {
+      .name {
+        border-bottom-color: transparent;
+      }
+    }
+  }
+  ///
+  /// Future Imperfect by HTML5 UP
+  /// html5up.net | @ajlkn
+  /// Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+  ///
+
+  /* Blurb */
+
+  .blurb {
+    h2 {
+      font-size: 0.8em;
+      margin: 0 0 (_size(element-margin) * 0.75) 0;
+    }
+
+    h3 {
+      font-size: 0.7em;
+    }
+
+    p {
+      font-size: 0.9em;
+    }
+  }
+
+  ///
+  /// Future Imperfect by HTML5 UP
+  /// html5up.net | @ajlkn
+  /// Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+  ///
+
+  /* Box */
+
+  .box {
+    border: solid 1px _palette(border);
+    margin-bottom: _size(element-margin);
+    padding: 1.5em;
+
+    > :last-child,
+    > :last-child > :last-child,
+    > :last-child > :last-child > :last-child {
+      margin-bottom: 0;
+    }
+
+    &.alt {
+      border: 0;
+      border-radius: 0;
+      padding: 0;
+    }
+  }
+
+  ///
+  /// Future Imperfect by HTML5 UP
+  /// html5up.net | @ajlkn
+  /// Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+  ///
+
+  /* Button */
+
+  input[type="submit"],
+  input[type="reset"],
+  input[type="button"],
+  button,
+  .button {
+    @include vendor("appearance", "none");
+    @include vendor(
+      "transition",
+      (
+        "background-color #{_duration(transition)} ease",
+        "box-shadow #{_duration(transition)} ease",
+        "color #{_duration(transition)} ease"
+      )
+    );
+    background-color: transparent;
+    border: 0;
+    box-shadow: inset 0 0 0 1px _palette(border);
+    color: _palette(fg-bold) !important;
+    cursor: pointer;
+    display: inline-block;
+    font-family: _font(family-heading);
+    font-size: 0.6em;
+    font-weight: _font(weight-heading-bold);
+    height: _size(element-height) * 1.75;
+    letter-spacing: _font(kerning-heading);
+    line-height: _size(element-height) * 1.75;
+    padding: 0 2.5em;
+    text-align: center;
+    text-decoration: none;
+    text-transform: uppercase;
+    white-space: nowrap;
+
+    &:hover {
+      box-shadow: inset 0 0 0 1px _palette(accent);
+      color: _palette(accent) !important;
+
+      &:active {
+        background-color: transparentize(_palette(accent), 0.95);
+      }
+    }
+
+    &:before,
+    &:after {
+      color: _palette(fg-light);
+      position: relative;
+    }
+
+    &:before {
+      left: -1em;
+      padding: 0 0 0 0.75em;
+    }
+
+    &:after {
+      left: 1em;
+      padding: 0 0.75em 0 0;
+    }
+
+    &.fit {
+      display: block;
+      margin: 0 0 (_size(element-margin) * 0.5) 0;
+      width: 100%;
+    }
+
+    &.big {
+      font-size: 0.7em;
+      padding: 0 3em;
+    }
+
+    &.small {
+      font-size: 0.5em;
+    }
+
+    &.disabled,
+    &:disabled {
+      @include vendor("pointer-events", "none");
+      color: _palette(border) !important;
+
+      &:before {
+        color: _palette(border) !important;
+      }
+    }
+  }
+
+  ///
+  /// Future Imperfect by HTML5 UP
+  /// html5up.net | @ajlkn
+  /// Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+  ///
+
+  /* Form */
+
+  form {
+    margin: 0 0 _size(element-margin) 0;
+
+    &.search {
+      @include icon;
+      position: relative;
+
+      &:before {
+        color: _palette(fg-light);
+        content: "\f002";
+        display: block;
+        height: _size(element-height);
+        left: 0;
+        line-height: _size(element-height);
+        position: absolute;
+        text-align: center;
+        top: 0;
+        width: 2.5em;
+      }
+
+      > input:first-child {
+        padding-left: 2.5em;
+      }
+    }
+  }
+
+  label {
+    color: _palette(fg-bold);
+    display: block;
+    font-size: 0.9em;
+    font-weight: _font(weight-bold);
+    margin: 0 0 (_size(element-margin) * 0.5) 0;
+  }
+
+  input[type="text"],
+  input[type="password"],
+  input[type="email"],
+  input[type="tel"],
+  select,
+  textarea {
+    @include vendor("appearance", "none");
+    background: _palette(border-bg);
+    border: none;
+    border: solid 1px _palette(border);
+    border-radius: 0;
+    color: inherit;
+    display: block;
+    outline: 0;
+    padding: 0 1em;
+    text-decoration: none;
+    width: 100%;
+
+    &:invalid {
+      box-shadow: none;
+    }
+
+    &:focus {
+      border-color: _palette(accent);
+      box-shadow: inset 0 0 0 1px _palette(accent);
+    }
+  }
+
+  .select-wrapper {
+    @include icon;
+    display: block;
+    position: relative;
+
+    &:before {
+      color: _palette(border);
+      content: "\f078";
+      display: block;
+      height: _size(element-height);
+      line-height: _size(element-height);
+      pointer-events: none;
+      position: absolute;
+      right: 0;
+      text-align: center;
+      top: 0;
+      width: _size(element-height);
+    }
+
+    select::-ms-expand {
+      display: none;
+    }
+  }
+
+  input[type="text"],
+  input[type="password"],
+  input[type="email"],
+  select {
+    height: _size(element-height);
+  }
+
+  textarea {
+    padding: 0.75em 1em;
+  }
+
+  input[type="checkbox"],
+  input[type="radio"] {
+    @include vendor("appearance", "none");
+    display: block;
+    float: left;
+    margin-right: -2em;
+    opacity: 0;
+    width: 1em;
+    z-index: -1;
+
+    & + label {
+      @include icon;
+      color: _palette(fg);
+      cursor: pointer;
+      display: inline-block;
+      font-size: 1em;
+      font-weight: _font(weight);
+      padding-left: (_size(element-height) * 0.6) + 0.75em;
+      padding-right: 0.75em;
+      position: relative;
+
+      &:before {
+        background: _palette(border-bg);
+        border: solid 1px _palette(border);
+        content: "";
+        display: inline-block;
+        height: (_size(element-height) * 0.6);
+        left: 0;
+        line-height: (_size(element-height) * 0.575);
+        position: absolute;
+        text-align: center;
+        top: 0;
+        width: (_size(element-height) * 0.6);
+      }
+    }
+
+    &:checked + label {
+      &:before {
+        background: _palette(fg-bold);
+        border-color: _palette(fg-bold);
+        color: _palette(bg);
+        content: "\f00c";
+      }
+    }
+
+    &:focus + label {
+      &:before {
+        border-color: _palette(accent);
+        box-shadow: 0 0 0 1px _palette(accent);
+      }
+    }
+  }
+
+  input[type="checkbox"] {
+    & + label {
+      &:before {
+      }
+    }
+  }
+
+  input[type="radio"] {
+    & + label {
+      &:before {
+        border-radius: 100%;
+      }
+    }
+  }
+
+  ::-webkit-input-placeholder {
+    color: _palette(fg-light) !important;
+    opacity: 1;
+  }
+
+  :-moz-placeholder {
+    color: _palette(fg-light) !important;
+    opacity: 1;
+  }
+
+  ::-moz-placeholder {
+    color: _palette(fg-light) !important;
+    opacity: 1;
+  }
+
+  :-ms-input-placeholder {
+    color: _palette(fg-light) !important;
+    opacity: 1;
+  }
+
+  .formerize-placeholder {
+    color: _palette(fg-light) !important;
+    opacity: 1;
+  }
+
+  ///
+  /// Future Imperfect by HTML5 UP
+  /// html5up.net | @ajlkn
+  /// Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+  ///
+
+  /* Icon */
+
+  .icon {
+    @include icon;
+    border-bottom: none;
+    position: relative;
+
+    > .label {
+      display: none;
+    }
+
+    &.prefix {
+    }
+
+    &.suffix {
+      &:before {
+        float: right;
+      }
+    }
+  }
+
+  ///
+  /// Future Imperfect by HTML5 UP
+  /// html5up.net | @ajlkn
+  /// Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+  ///
+
+  /* Image */
+
+  .image {
+    border: 0;
+    display: inline-block;
+    position: relative;
+
+    img {
+      display: block;
+    }
+
+    &.left,
+    &.right {
+      max-width: 40%;
+
+      img {
+        width: 100%;
+      }
+    }
+
+    &.left {
+      float: left;
+      padding: 0 1.5em 1em 0;
+      top: 0.25em;
+    }
+
+    &.right {
+      float: right;
+      padding: 0 0 1em 1.5em;
+      top: 0.25em;
+    }
+
+    &.fit {
+      display: block;
+      margin: 0 0 _size(element-margin) 0;
+      width: 100%;
+
+      img {
+        width: 100%;
+      }
+    }
+
+    &.featured {
+      display: block;
+      margin: 0 0 _size(section-spacing) 0;
+      width: 100%;
+
+      img {
+        width: 100%;
+      }
+
+      @include breakpoint(small) {
+        margin: 0 0 _size(section-spacing-small) 0;
+      }
+    }
+
+    &.main {
+      display: block;
+      margin: 0 0 (_size(element-margin) * 1.5) 0;
+      width: 100%;
+
+      img {
+        width: 100%;
+      }
+    }
+  }
+
+  ///
+  /// Future Imperfect by HTML5 UP
+  /// html5up.net | @ajlkn
+  /// Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+  ///
+
+  /* List */
+
+  ol {
+    list-style: decimal;
+    margin: 0 0 _size(element-margin) 0;
+    padding-left: 1.25em;
+
+    li {
+      padding-left: 0.25em;
+    }
+  }
+
+  ul {
+    list-style: disc;
+    margin: 0 0 _size(element-margin) 0;
+    padding-left: 1em;
+
+    li {
+      padding-left: 0.5em;
+    }
+
+    &.alt {
+      list-style: none;
+      padding-left: 0;
+
+      li {
+        border-top: solid 1px _palette(border);
+        padding: 0.5em 0;
+
+        &:first-child {
+          border-top: 0;
+          padding-top: 0;
+        }
+      }
+    }
+
+    &.icons {
+      cursor: default;
+      list-style: none;
+      padding-left: 0;
+
+      li {
+        display: inline-block;
+        padding: 0 1em 0 0;
+
+        &:last-child {
+          padding-right: 0;
+        }
+
+        > * {
+          @include icon;
+          border: 0;
+
+          .label {
+            display: none;
+          }
+        }
+      }
+    }
+
+    &.actions {
+      cursor: default;
+      list-style: none;
+      padding-left: 0;
+
+      li {
+        display: inline-block;
+        padding: 0 (_size(element-margin) * 0.75) 0 0;
+        vertical-align: middle;
+
+        &:last-child {
+          padding-right: 0;
+        }
+      }
+
+      &.pagination {
+        .next {
+          @include icon("", after);
+
+          &:after {
+            content: "\f054";
+          }
+        }
+
+        .previous {
+          @include icon("", before);
+
+          &:before {
+            content: "\f053";
+          }
+        }
+
+        @include breakpoint(large) {
+          text-align: center;
+
+          .next,
+          .previous {
+            min-width: 20em;
+          }
+        }
+
+        @include breakpoint(small) {
+          .next,
+          .previous {
+            min-width: 18em;
+          }
+        }
+      }
+
+      &.small {
+        li {
+          padding: 0 (_size(element-margin) * 0.5) 0 0;
+        }
+      }
+
+      &.vertical {
+        li {
+          display: block;
+          padding: (_size(element-margin) * 0.75) 0 0 0;
+
+          &:first-child {
+            padding-top: 0;
+          }
+
+          > * {
+            margin-bottom: 0;
+          }
+        }
+
+        &.small {
+          li {
+            padding: (_size(element-margin) * 0.5) 0 0 0;
+
+            &:first-child {
+              padding-top: 0;
+            }
+          }
+        }
+      }
+
+      &.fit {
+        display: table;
+        margin-left: (_size(element-margin) * -0.5);
+        padding: 0;
+        table-layout: fixed;
+        width: calc(100% + #{(_size(element-margin) * 0.5)});
+
+        li {
+          display: table-cell;
+          padding: 0 0 0 (_size(element-margin) * 0.5);
+
+          > * {
+            margin-bottom: 0;
+          }
+        }
+
+        &.small {
+          margin-left: (_size(element-margin) * -0.25);
+          width: calc(100% + #{(_size(element-margin) * 0.25)});
+
+          li {
+            padding: 0 0 0 (_size(element-margin) * 0.25);
+          }
+        }
+      }
+
+      @include breakpoint(xsmall) {
+        margin: 0 0 _size(element-margin) 0;
+
+        li {
+          padding: (_size(element-margin) * 0.5) 0 0 0;
+          display: block;
+          text-align: center;
+          width: 100%;
+
+          &:first-child {
+            padding-top: 0;
+          }
+
+          > * {
+            width: 100%;
+            margin: 0 !important;
+
+            &.icon {
+              &:before {
+              }
+            }
+          }
+        }
+
+        &.small {
+          li {
+            padding: (_size(element-margin) * 0.25) 0 0 0;
+
+            &:first-child {
+              padding-top: 0;
+            }
+          }
+        }
+      }
+    }
+
+    &.posts {
+      list-style: none;
+      padding: 0;
+
+      li {
+        border-top: dotted 1px _palette(border);
+        margin: (_size(element-margin) * 0.75) 0 0 0;
+        padding: (_size(element-margin) * 0.75) 0 0 0;
+
+        &:first-child {
+          border-top: 0;
+          margin-top: 0;
+          padding-top: 0;
+        }
+      }
+
+      article {
+        @include vendor("display", "flex");
+        @include vendor("align-items", "flex-start");
+        @include vendor("flex-direction", "row-reverse");
+
+        .image {
+          display: block;
+          margin-right: 1.5em;
+          min-width: 4em;
+          width: 4em;
+
+          img {
+            width: 100%;
+          }
+        }
+
+        header {
+          @include vendor("flex-grow", "1");
+          -ms-flex: 1;
+
+          h3 {
+            font-size: 0.7em;
+            margin-top: 0.125em;
+          }
+
+          .published {
+            display: block;
+            font-family: _font(family-heading);
+            font-size: 0.6em;
+            font-weight: _font(weight-heading);
+            letter-spacing: _font(kerning-heading);
+            margin: -0.625em 0 (_size(element-margin) * 0.85) 0;
+            text-transform: uppercase;
+          }
+
+          > :last-child {
+            margin-bottom: 0;
+          }
+        }
+      }
+    }
+  }
+
+  dl {
+    margin: 0 0 _size(element-margin) 0;
+
+    dt {
+      display: block;
+      font-weight: _font(weight-bold);
+      margin: 0 0 (_size(element-margin) * 0.5) 0;
+    }
+
+    dd {
+      margin-left: _size(element-margin);
+    }
+  }
+
+  ///
+  /// Future Imperfect by HTML5 UP
+  /// html5up.net | @ajlkn
+  /// Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+  ///
+
+  /* Mini Post */
+  .cell-container {
+    position: relative;
+
+    .description {
+      position: absolute;
+      padding: 0;
+      bottom: 0;
+      border-top: solid 1px _palette(border);
+
+      p {
+        font-size: 0.9rem;
+        margin: 0;
+        padding: 1.25em;
+        background-color: rgba(255, 255, 255, 0.7);
+        color: #3c3b3b;
+        font-family: "Raleway", Helvetica, sans-serif;
+        z-index: 1000;
+        transition: all 0.1s;
+        -webkit-transition: all 0.1s ease-in-out;
+      }
+
+      p:hover {
+        background-color: rgba(255, 255, 255, 0.9);
+      }
+    }
+
+    @media (max-width: 480px) {
+      .description {
+        position: inherit;
+        padding: 0;
+        bottom: inherit;
+      }
+    }
+  }
+
+  .mini-post {
+    @include vendor("display", "flex");
+    @include vendor("flex-direction", "column");
+    background: _palette(bg);
+    border: solid 1px _palette(border);
+    margin: 0 0 _size(element-margin);
+
+    .image {
+      overflow: hidden;
+      width: 100%;
+
+      img {
+        @include vendor(
+          "transition",
+          "transform #{_duration(transition)} ease-out"
+        );
+        width: 100%;
+      }
+
+      &:hover {
+        img {
+          @include vendor("transform", "scale(1.05)");
+        }
+      }
+    }
+
+    header {
+      z-index: 2;
+      @include padding(1.25em, 1.25em, (0, 3em, 0, 0));
+      min-height: 4em;
+      position: relative;
+      @include vendor("flex-grow", "1");
+
+      h3 {
+        font-size: 0.7em;
+      }
+
+      .published {
+        display: block;
+        font-family: _font(family-heading);
+        font-size: 0.6em;
+        font-weight: _font(weight-heading);
+        letter-spacing: _font(kerning-heading);
+        margin: -0.625em 0 (_size(element-margin) * 0.85) 0;
+        text-transform: uppercase;
+      }
+
+      .author {
+        position: absolute;
+        right: 2em;
+        top: 2em;
+      }
+    }
+  }
+
+  .mini-posts {
+    margin: 0 0 _size(element-margin);
+    @include breakpoint(large) {
+      @include vendor("display", "flex");
+      @include vendor("flex-wrap", "wrap");
+      width: calc(100% + #{_size(element-margin)});
+
+      > * {
+        margin: _size(element-margin) _size(element-margin) 0 0;
+        width: calc(50% - #{_size(element-margin)});
+      }
+
+      > :nth-child(-n + 2) {
+        margin-top: 0;
+      }
+    }
+    @include breakpoint(xsmall) {
+      display: block;
+      width: 100%;
+
+      > * {
+        margin: 0 0 _size(element-margin);
+        width: 100%;
+      }
+    }
+  }
+
+  ///
+  /// Future Imperfect by HTML5 UP
+  /// html5up.net | @ajlkn
+  /// Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+  ///
+
+  /* Post */
+
+  .post {
+    @include padding(_size(section-spacing), _size(section-spacing));
+    background: _palette(bg);
+    border: solid 1px _palette(border);
+    margin: 0 0 _size(section-spacing) 0;
+    position: relative;
+
+    > header {
+      @include vendor("display", "flex");
+      border-bottom: solid 1px _palette(border);
+      left: (_size(section-spacing) * -1);
+      margin: (_size(section-spacing) * -1) 0 _size(section-spacing) 0;
+      position: relative;
+      width: calc(100% + #{_size(section-spacing) * 2});
+
+      .title {
+        @include vendor("flex-grow", "1");
+        -ms-flex: 1;
+        padding: (_size(section-spacing) * 1.25) _size(section-spacing)
+          (_size(section-spacing) * 1.1) _size(section-spacing);
+
+        h2 {
+          font-weight: _font(weight-heading-extrabold);
+          font-size: 1.5em;
+        }
+
+        > :last-child {
+          margin-bottom: 0;
+        }
+      }
+
+      .meta {
+        @include padding(_size(section-spacing) * 1.25, _size(section-spacing));
+        border-left: solid 1px _palette(border);
+        min-width: 17em;
+        text-align: right;
+        width: 17em;
+
+        > * {
+          margin: 0 0 (_size(element-margin) * 0.5) 0;
+        }
+
+        > :last-child {
+          margin-bottom: 0;
+        }
+
+        .published {
+          color: _palette(fg-bold);
+          display: block;
+          font-family: _font(family-heading);
+          font-size: 0.7em;
+          font-weight: _font(weight-heading-bold);
+          letter-spacing: _font(kerning-heading);
+          margin-top: 0.5em;
+          text-transform: uppercase;
+          white-space: nowrap;
+        }
+      }
+    }
+
+    > a.image.featured {
+      overflow: hidden;
+
+      img {
+        @include vendor(
+          "transition",
+          "transform #{_duration(transition)} ease-out"
+        );
+      }
+
+      &:hover {
+        img {
+          @include vendor("transform", "scale(1.05)");
+        }
+      }
+    }
+
+    > footer {
+      @include vendor("display", "flex");
+      @include vendor("align-items", "center");
+
+      .actions {
+        @include vendor("flex-grow", "1");
+      }
+
+      .stats {
+        cursor: default;
+        list-style: none;
+        padding: 0;
+
+        li {
+          border-left: solid 1px _palette(border);
+          display: inline-block;
+          font-family: _font(family-heading);
+          font-size: 0.6em;
+          font-weight: _font(weight-heading);
+          letter-spacing: _font(kerning-heading);
+          line-height: 1;
+          margin: 0 0 0 2em;
+          padding: 0 0 0 2em;
+          text-transform: uppercase;
+
+          &:first-child {
+            border-left: 0;
+            margin-left: 0;
+            padding-left: 0;
+          }
+
+          .icon {
+            border-bottom: 0;
+
+            &:before {
+              color: _palette(border);
+              margin-right: 0.75em;
+            }
+          }
+        }
+      }
+    }
+
+    @include breakpoint(medium) {
+      border-left: 0;
+      border-right: 0;
+      left: _size(section-spacing) * -1;
+      width: calc(100% + (#{_size(section-spacing)} * 2));
+
+      > header {
+        @include vendor("flex-direction", "column");
+        @include padding(
+          _size(section-spacing) * 1.25,
+          _size(section-spacing),
+          (0, 0, -0.5em, 0)
+        );
+        border-left: 0;
+
+        .title {
+          -ms-flex: 0 1 auto;
+          margin: 0 0 _size(element-margin) 0;
+          padding: 0;
+          text-align: center;
+        }
+
+        .meta {
+          @include vendor("align-items", "center");
+          @include vendor("display", "flex");
+          @include vendor("justify-content", "center");
+          border-left: 0;
+          margin: 0 0 _size(element-margin) 0;
+          padding-top: 0;
+          padding: 0;
+          text-align: left;
+          width: 100%;
+
+          > * {
+            border-left: solid 1px _palette(border);
+            margin-left: 2em;
+            padding-left: 2em;
+          }
+
+          > :first-child {
+            border-left: 0;
+            margin-left: 0;
+            padding-left: 0;
+          }
+
+          .published {
+            margin-bottom: 0;
+            margin-top: 0;
+          }
+
+          .author {
+            @include vendor("flex-direction", "row-reverse");
+            margin-bottom: 0;
+
+            .name {
+              margin: 0 0 0 1.5em;
+            }
+
+            img {
+              width: 3.5em;
+            }
+          }
+        }
+      }
+    }
+
+    @include breakpoint(small) {
+      @include padding(
+        _size(section-spacing-small),
+        _size(section-spacing-small)
+      );
+      left: _size(section-spacing-small) * -1;
+      margin: 0 0 _size(element-margin) 0;
+      width: calc(100% + (#{_size(section-spacing-small)} * 2));
+
+      > header {
+        @include padding(
+          _size(section-spacing-small) * 2,
+          _size(section-spacing-small),
+          (0, 0, -0.5em, 0)
+        );
+        left: (_size(section-spacing-small) * -1);
+        margin: (_size(section-spacing-small) * -1) 0
+          _size(section-spacing-small) 0;
+        width: calc(100% + #{_size(section-spacing-small) * 2});
+
+        .title {
+          h2 {
+            font-size: 1.1em;
+          }
+        }
+      }
+    }
+
+    @include breakpoint(xsmall) {
+      > header {
+        .meta {
+          @include vendor("align-items", "center");
+          @include vendor("flex-direction", "column");
+
+          > * {
+            border-left: 0;
+            margin: (_size(element-margin) * 0.5) 0 0 0;
+            padding-left: 0;
+          }
+
+          .author {
+            .name {
+              display: none;
+            }
+          }
+        }
+      }
+
+      > .image.featured {
+        margin-left: _size(section-spacing-small) * -1;
+        margin-top: calc(#{_size(section-spacing-small) * -1} - 1px);
+        width: calc(100% + #{_size(section-spacing-small) * 2});
+      }
+
+      > footer {
+        @include vendor("align-items", "stretch");
+        @include vendor("flex-direction", "column-reverse");
+
+        .stats {
+          text-align: center;
+
+          li {
+            margin: 0 0 0 1.25em;
+            padding: 0 0 0 1.25em;
+          }
+        }
+      }
+    }
+  }
+  ///
+  /// Future Imperfect by HTML5 UP
+  /// html5up.net | @ajlkn
+  /// Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+  ///
+
+  /* Section/Article */
+
+  section,
+  article {
+    &.special {
+      text-align: center;
+    }
+  }
+
+  header {
+    p {
+      font-family: _font(family-heading);
+      font-size: 0.7em;
+      font-weight: _font(weight-heading);
+      letter-spacing: _font(kerning-heading);
+      line-height: 2.5;
+      margin-top: -1em;
+      text-transform: uppercase;
+    }
+  }
+
+  ///
+  /// Future Imperfect by HTML5 UP
+  /// html5up.net | @ajlkn
+  /// Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+  ///
+
+  /* Table */
+
+  .table-wrapper {
+    -webkit-overflow-scrolling: touch;
+    overflow-x: auto;
+  }
+
+  table {
+    margin: 0 0 _size(element-margin) 0;
+    width: 100%;
+
+    tbody {
+      tr {
+        border: solid 1px _palette(border);
+        border-left: 0;
+        border-right: 0;
+
+        &:nth-child(2n + 1) {
+          background-color: _palette(border-bg);
+        }
+      }
+    }
+
+    td {
+      padding: 0.75em 0.75em;
+    }
+
+    th {
+      color: _palette(fg-bold);
+      font-size: 0.9em;
+      font-weight: _font(weight-bold);
+      padding: 0 0.75em 0.75em 0.75em;
+      text-align: left;
+    }
+
+    thead {
+      border-bottom: solid 2px _palette(border);
+    }
+
+    tfoot {
+      border-top: solid 2px _palette(border);
+    }
+
+    &.alt {
+      border-collapse: separate;
+
+      tbody {
+        tr {
+          td {
+            border: solid 1px _palette(border);
+            border-left-width: 0;
+            border-top-width: 0;
+
+            &:first-child {
+              border-left-width: 1px;
+            }
+          }
+
+          &:first-child {
+            td {
+              border-top-width: 1px;
+            }
+          }
+        }
+      }
+
+      thead {
+        border-bottom: 0;
+      }
+
+      tfoot {
+        border-top: 0;
+      }
+    }
+  }
+
+  // Not found page
+
+  .bm-item-list {
+    margin-top: 0;
+  }
+
+  .menu-hover {
+    padding: 0 1em;
+  }
+
+  .menu-hover:hover {
+    opacity: 0.5;
+  }
+
+  .hamburger-ul {
+    display: block;
+
+    li a h3 {
+      border: 0;
+      border-top: dotted 1px rgba(160, 160, 160, 0.3);
+      margin: 1.5em 0 0 0;
+      padding: 1.5em 0 0 0;
+    }
+
+    li a h3:hover {
+      color: _palette(accent);
+    }
+
+    li {
+      display: block !important;
+    }
+
+    h3 {
+      font-size: 0.7em;
+    }
+
+    .index-li {
+      border-top: none;
+    }
+  }
+
+  // About page (/about)
+
+  .markdown {
+    p {
+      margin: auto;
+    }
+
+    h1 {
+      font-size: 0.8em;
+      margin-top: 3em;
+    }
+  }
+
+  ///
+  /// Future Imperfect by HTML5 UP
+  /// html5up.net | @ajlkn
+  /// Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+  ///
+
+  /* Header */
+
+  body {
+    padding-top: 3.5em;
+  }
+
+  #header {
+    @include vendor("display", "flex");
+    @include vendor("justify-content", "space-between");
+    background-color: _palette(bg);
+    border-bottom: solid 1px _palette(border);
+    height: 3.5em;
+    left: 0;
+    line-height: 3.5em;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 4;
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    ul {
+      list-style: none;
+      margin: 0;
+      padding-left: 0;
+
+      li {
+        display: inline-block;
+        padding-left: 0;
+      }
+    }
+
+    h1 {
+      height: inherit;
+      line-height: inherit;
+      padding: 0 0 0 1.5em;
+      white-space: nowrap;
+
+      a {
+        font-size: 0.7em;
+      }
+    }
+
+    .links {
+      @include vendor("flex", "1");
+      border-left: solid 1px _palette(border);
+      height: inherit;
+      line-height: inherit;
+      margin-left: 1.5em;
+      overflow: hidden;
+      padding-left: 1.5em;
+
+      ul {
+        li {
+          border-left: solid 1px _palette(border);
+          line-height: 1;
+          margin-left: 1em;
+          padding-left: 1em;
+
+          &:first-child {
+            border-left: 0;
+            margin-left: 0;
+            padding-left: 0;
+          }
+
+          a {
+            border-bottom: 0;
+            font-family: _font(family-heading);
+            font-size: 0.7em;
+            font-weight: _font(weight-heading);
+            letter-spacing: _font(kerning-heading);
+            text-transform: uppercase;
+          }
+        }
+      }
+    }
+
+    .main {
+      height: inherit;
+      line-height: inherit;
+      text-align: right;
+
+      ul {
+        height: inherit;
+        line-height: inherit;
+
+        li {
+          border-left: solid 1px _palette(border);
+          height: inherit;
+          line-height: inherit;
+          white-space: nowrap;
+
+          > i {
+            text-decoration: none;
+            border-bottom: 0;
+            overflow: hidden;
+            position: relative;
+            text-indent: 4em;
+            margin-right: 1.5em;
+          }
+
+          > * {
+            display: block;
+            float: left;
+          }
+
+          > a {
+            @include icon;
+            border-bottom: 0;
+            color: _palette(fg-light);
+            overflow: hidden;
+            position: relative;
+            text-indent: 4em;
+            width: 4em;
+
+            &:before {
+              display: block;
+              height: inherit;
+              left: 0;
+              line-height: inherit;
+              position: absolute;
+              text-align: center;
+              text-indent: 0;
+              top: 0;
+              width: inherit;
+            }
+          }
+        }
+      }
+    }
+
+    @include breakpoint(medium) {
+      .links {
+        display: none;
+      }
+    }
+
+    @include breakpoint(small) {
+      height: 2.75em;
+      line-height: 2.75em;
+
+      h1 {
+        padding: 0 0 0 1em;
+      }
+
+      .main {
+        .search {
+          display: none;
+        }
+      }
+    }
+  }
+
+  /* Position and sizing of burger button */
+  .bm-burger-button {
+    display: none;
+  }
+
+  /* Color/shape of burger icon bars */
+  .bm-burger-bars {
+    display: none;
+  }
+
+  /* Position and sizing of clickable cross button */
+  .bm-cross-button {
+    display: none;
+  }
+
+  /* Color/shape of close button cross */
+  .bm-cross {
+    display: none;
+  }
+
+  /* General sidebar styles */
+  .bm-menu {
+    background: _palette(bg);
+    padding: 2.5em 1.5em 0;
+    font-size: 1.15em;
+  }
+
+  /* Wrapper for item list */
+  .bm-item-list {
+    color: _palette(fg-bold);
+    padding: 0.8em;
+    font-family: "Raleway", Helvetica, sans-serif;
+  }
+
+  #header .index-link {
+    z-index: 3;
+  }
+
+  #header .main .menu {
+    cursor: pointer;
+  }
+
+  #header .main .close-menu {
+    border: 0;
+    z-index: 10;
+  }
+
+  #header .main .open-menu {
+    border: 0;
+  }
+
+  .open-menu {
+    position: fixed;
+    right: 0;
+    border: none;
+  }
+
+  .close-menu {
+    position: fixed;
+    right: 0;
+    z-index: 3;
+    border-left: 0;
+  }
+
+  .hamburger-container {
+    display: none;
+  }
+
+  @include breakpoint(medium) {
+    .hamburger-container {
+      display: initial;
+    }
+  }
+
+  ///
+  /// Future Imperfect by HTML5 UP
+  /// html5up.net | @ajlkn
+  /// Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+  ///
+
+  /* Wrapper */
+
+  #wrapper {
+    @include vendor("display", "flex");
+    @include vendor("flex-direction", "row-reverse");
+    @include vendor("transition", "opacity #{_duration(menu)} ease");
+    margin: 0 auto;
+    max-width: 100%;
+    opacity: 1;
+    padding: (_size(section-spacing) * 1.5);
+    width: 90em;
+
+    body.is-menu-visible & {
+      opacity: 0.15;
+    }
+
+    @include breakpoint(xlarge) {
+      padding: _size(section-spacing);
+    }
+
+    @include breakpoint(large) {
+      display: block;
+    }
+
+    @include breakpoint(small) {
+      padding: _size(section-spacing-small);
+    }
+
+    body.single & {
+      display: block;
+    }
+  }
+
+  ///
+  /// Future Imperfect by HTML5 UP
+  /// html5up.net | @ajlkn
+  /// Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+  ///
+
+  /* Main */
+
+  #main {
+    @include vendor("flex-grow", "1");
+    -ms-flex: 1;
+    width: 100%;
+  }
+
+  ///
+  /// Future Imperfect by HTML5 UP
+  /// html5up.net | @ajlkn
+  /// Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+  ///
+
+  /* Sidebar */
+
+  #sidebar {
+    margin-right: _size(section-spacing);
+    min-width: 22em;
+    width: 22em;
+
+    > * {
+      border-top: solid 1px _palette(border);
+      margin: _size(section-spacing) 0 0 0;
+      padding: _size(section-spacing) 0 0 0;
+    }
+
+    > :first-child {
+      border-top: 0;
+      margin-top: 0;
+      padding-top: 0;
+    }
+
+    @include breakpoint(large) {
+      border-top: solid 1px _palette(border);
+      margin: _size(section-spacing) 0 0 0;
+      min-width: 0;
+      padding: _size(section-spacing) 0 0 0;
+      width: 100%;
+    }
+  }
+
+  /* Intro */
+
+  #intro {
+    .logo {
+      border-bottom: 0;
+      display: inline-block;
+      margin: 0 0 (_size(element-margin) * 0.5) 0;
+      overflow: hidden;
+      position: relative;
+
+      img {
+        width: 10em;
+        border-radius: 50%;
+        display: block;
+      }
+    }
+
+    header {
+      h2 {
+        font-size: 1.5em;
+        font-weight: _font(weight-heading-extrabold);
+      }
+
+      p {
+        font-size: 0.8em;
+      }
+    }
+
+    @include breakpoint(large) {
+      margin: 0 0 _size(section-spacing) 0;
+      text-align: center;
+
+      header {
+        h2 {
+          font-size: 2em;
+        }
+
+        p {
+          font-size: 0.7em;
+        }
+      }
+    }
+
+    @include breakpoint(small) {
+      margin: 0 0 _size(section-spacing-small) 0;
+      padding: 1.25em 0;
+
+      > :last-child {
+        margin-bottom: 0;
+      }
+
+      .logo {
+        margin: 0 0 (_size(element-margin) * 0.25) 0;
+      }
+
+      header {
+        h2 {
+          font-size: 1.25em;
+        }
+
+        > :last-child {
+          margin-bottom: 0;
+        }
+      }
+    }
+  }
+
+  ///
+  /// Future Imperfect by HTML5 UP
+  /// html5up.net | @ajlkn
+  /// Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+  ///
+
+  /* Footer */
+
+  #footer {
+    .icons {
+      color: _palette(fg-light);
+    }
+
+    .copyright {
+      color: _palette(fg-light);
+      font-family: _font(family-heading);
+      font-size: 0.5em;
+      font-weight: _font(weight-heading);
+      letter-spacing: _font(kerning-heading);
+      text-transform: uppercase;
+    }
+
+    body.single & {
+      text-align: center;
+    }
+  }
+
+  ///
+  /// Future Imperfect by HTML5 UP
+  /// html5up.net | @ajlkn
+  /// Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+  ///
+
+  /* Menu */
+
+  #menu {
+    @include vendor("transform", "translateX(#{_size(menu)})");
+    @include vendor(
+      "transition",
+      ("transform #{_duration(menu)} ease", "visibility #{_duration(menu)}")
+    );
+    -webkit-overflow-scrolling: touch;
+    background: _palette(bg);
+    border-left: solid 1px _palette(border);
+    box-shadow: none;
+    height: 100%;
+    max-width: 80%;
+    overflow-y: auto;
+    position: fixed;
+    right: 0;
+    top: 0;
+    visibility: hidden;
+    width: _size(menu);
+    z-index: _misc(z-index-base) + 2;
+
+    > * {
+      border-top: solid 1px _palette(border);
+      padding: _size(section-spacing);
+
+      > :last-child {
+        margin-bottom: 0;
+      }
+    }
+
+    > :first-child {
+      border-top: 0;
+    }
+
+    .links {
+      list-style: none;
+      padding: 0;
+
+      > li {
+        border: 0;
+        border-top: dotted 1px _palette(border);
+        margin: 1.5em 0 0 0;
+        padding: 1.5em 0 0 0;
+
+        a {
+          display: block;
+          border-bottom: 0;
+
+          h3 {
+            @include vendor(
+              "transition",
+              "color #{_duration(transition)} ease"
+            );
+            font-size: 0.7em;
+          }
+
+          p {
+            font-family: _font(family-heading);
+            font-size: 0.6em;
+            font-weight: _font(weight-heading);
+            letter-spacing: _font(kerning-heading);
+            letter-spacing: _size(letter-spacing-alt);
+            margin-bottom: 0;
+            text-decoration: none;
+            text-transform: uppercase;
+          }
+
+          &:hover {
+            h3 {
+              color: _palette(accent);
+            }
+          }
+        }
+
+        &:first-child {
+          border-top: 0;
+          margin-top: 0;
+          padding-top: 0;
+        }
+      }
+    }
+
+    body.is-menu-visible & {
+      @include vendor("transform", "translateX(0)");
+      visibility: visible;
+    }
+
+    @include breakpoint(small) {
+      > * {
+        padding: _size(section-spacing-small);
+      }
+    }
+  }
+
+  // Contact page (/contact)
+
+  #contact {
+    .email-at {
+      margin: 3em 0;
+
+      p {
+        margin: 0;
+      }
+
+      .inline-container {
+        width: 100%;
+
+        span:focus {
+          display: inline-block;
+          outline: none;
+          border: 0;
+          text-align: right;
+        }
+      }
+    }
+  }
+
+  .inline {
+    min-width: 150px;
+    display: inline-block;
+    margin: 0;
+    padding: 0;
+    font-size: 15;
+    outline: 0;
+    border: 0;
+    text-align: right;
+  }
+
+  // Not found page (/*)
+
+  .not-found {
+    text-align: center;
+    margin: 5em;
+  }
+
+  /* Resume */
+
+  #resume {
+    .link-to {
+      position: relative;
+      top: -4.5em;
+    }
+
+    .link-container h4 {
+      text-decoration: none;
+      border-bottom: none;
+      display: inline-flex;
+
+      a {
+        padding: 0 0.5em;
+        margin: 0;
+      }
+    }
+
+    .education {
+      .title {
+        text-align: center;
+        margin-bottom: 2em;
+      }
+    }
+    .experience {
+      .title {
+        text-align: center;
+      }
+      .job {
+        margin: 1em;
+        p {
+          margin: 0;
+        }
+      }
+    }
+
+    .jobs-container {
+      .points {
+        li {
+          margin: 0;
+          padding: 0;
+          font-size: 0.9em;
+        }
+      }
+    }
+
+    .courses {
+      padding-top: 1.6em;
+      .title {
+        text-align: center;
+      }
+      .course-list {
+        text-align: center;
+
+        h4 {
+          white-space: nowrap;
+        }
+      }
+    }
+
+    .skills {
+      margin-top: 2em;
+      .title {
+        text-align: center;
+        p {
+          font-size: 0.9em;
+        }
+      }
+    }
+
+    .summary {
+      margin-bottom: 0.5em;
+      font-size: 0.9em;
+    }
+
+    .references {
+      margin: 2em 0;
+      .title {
+        text-align: center;
+      }
+    }
+  }
+
+  .daterange {
+    margin-bottom: 0.2em;
+  }
+
+  .degree-container {
+    h4 {
+      font-weight: normal;
+    }
+
+    .degree {
+      margin-bottom: 0.1em;
+      text-transform: none;
+      letter-spacing: 0.16em;
+      font-size: 0.8em;
+    }
+
+    .school {
+      text-transform: none;
+      padding-top: 0.3em;
+      margin-bottom: 1em;
+    }
+  }
+
+  .courses .course-number {
+    display: inline;
+  }
+  .courses .course-name {
+    display: inline;
+    font-family: "Raleway", Helvetica, sans-serif;
+    font-size: 0.7em;
+    font-weight: 400;
+    letter-spacing: 0.25em;
+    line-height: 2.5;
+    margin-top: -1em;
+    text-transform: uppercase;
+  }
+
+  .courses ul li {
+    display: inline;
+  }
+
+  .course-dot {
+    display: inline;
+    // display: none;
+  }
+
+  @include breakpoint(small) {
+    .course-dot {
+      display: none;
+    }
+    .course-container a {
+      display: block;
+    }
+  }
+
+  /* Skills */
+
+  .skills .title {
+    text-align: center;
+  }
+
+  .skill-button-container {
+    margin: 1.5em 0;
+    text-align: center;
+  }
+
+  .skillbutton {
+    box-shadow: none;
+    outline: none;
+  }
+
+  .skillbutton-active {
+    box-shadow: inset 0 0 0 1px _palette(accent);
+    color: _palette(accent) !important;
+  }
+
+  .skillbar {
+    position: relative;
+    display: block;
+    margin-bottom: 15px;
+    width: 100%;
+    background: #eee;
+    height: 35px;
+    border-radius: 3px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    -webkit-transition: 0.4s linear;
+    -moz-transition: 0.4s linear;
+    -ms-transition: 0.4s linear;
+    -o-transition: 0.4s linear;
+    transition: 0.4s linear;
+    -webkit-transition-property: width, background-color;
+    -moz-transition-property: width, background-color;
+    -ms-transition-property: width, background-color;
+    -o-transition-property: width, background-color;
+    transition-property: width, background-color;
+  }
+
+  .skillbar-title {
+    position: absolute;
+    top: 0;
+    left: 0;
+    font-weight: bold;
+    font-size: 13px;
+    color: #fff;
+    background: #6adcfa;
+    -webkit-border-top-left-radius: 3px;
+    -webkit-border-bottom-left-radius: 4px;
+    -moz-border-radius-topleft: 3px;
+    -moz-border-radius-bottomleft: 3px;
+    border-top-left-radius: 3px;
+    border-bottom-left-radius: 3px;
+  }
+
+  .skillbar-title span {
+    display: block;
+    background: rgba(0, 0, 0, 0.1);
+    padding: 0 20px;
+    height: 35px;
+    line-height: 35px;
+    -webkit-border-top-left-radius: 3px;
+    -webkit-border-bottom-left-radius: 3px;
+    -moz-border-radius-topleft: 3px;
+    -moz-border-radius-bottomleft: 3px;
+    border-top-left-radius: 3px;
+    border-bottom-left-radius: 3px;
+  }
+
+  .skillbar-bar {
+    height: 35px;
+    width: 0px;
+    background: #6adcfa;
+    border-radius: 3px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+  }
+
+  .skill-bar-percent {
+    position: absolute;
+    right: 10px;
+    top: 0;
+    font-size: 11px;
+    height: 35px;
+    line-height: 35px;
+    color: #444;
+    color: rgba(0, 0, 0, 0.4);
+  }
+  // About page (/about)
+
+  #stats {
+    table {
+      width: 100%;
+    }
+  }
+  .ta-center {
+    text-align: center;
+  }
+  .mt-45 {
+    margin-top: 45px;
+  }
+  /* For screens larger than 980px */
+  // @media (min-width: 980px) {
+  .web_view {
+    display: block;
+    border-right: 1px solid hsla(0, 0%, 63%, 0.3);
+    padding-right: 1em;
+    margin-left: auto;
+    border-left: 1px solid hsla(0, 0%, 63%, 0.3);
+    line-height: 1;
+    margin-left: 1em;
+    padding-left: 1em;
+  }
+
+  .web_view-button {
+    border-bottom: 0;
+    font-family: Raleway, Helvetica, sans-serif;
+    font-size: 0.7em;
+    font-weight: 400;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    border: none;
+    outline: none;
+    box-shadow: none;
+    padding: 0px;
+  }
+  .web_view-button:hover {
+    box-shadow: none;
+    color: #3c3b3b !important;
+  }
+  // }
+  /* For screens smaller than 980px */
+  @media (max-width: 981px) {
+    #header {
+      justify-content: left;
+    }
+  }
+}
+
+// @import "components/markdown";
+
+// Layout.
+
+// @import "layout/header";
+// @import "layout/wrapper";
+// @import "layout/main";
+// @import "layout/sidebar";
+// @import "layout/intro";
+// @import "layout/footer";
+// @import "layout/menu";
+
+// @import "pages/contact";
+// @import "pages/notFound";
+// @import "pages/resume";
+// @import "pages/skills";
+// @import "pages/stats";

@@ -15,6 +15,7 @@ import {
 import { MoonIcon, SunIcon } from "./icons";
 import useThemeSwitcher from "@/hooks/use-theme-switcher";
 import { SocialIcons } from "@/components/social-icons";
+import MessageBox from "./ui/message-box";
 
 interface CustomLinkProps {
   href: string;
@@ -47,7 +48,7 @@ const CustomLink = ({
   );
 };
 
-const Navbar = () => {
+const Navbar = ({ handleView }) => {
   const [mode, setMode] = useThemeSwitcher();
   const [toggle, showMenu] = useState(false);
   const [activeTitle, setActiveTitle] = useState<string>("Home");
@@ -64,7 +65,6 @@ const Navbar = () => {
         <Link href="/">
           <h1 className="text-xl md:text-2xl font-bold">Shashank</h1>
         </Link>
-
         <div>
           <CustomLink
             href="/#"
@@ -101,6 +101,12 @@ const Navbar = () => {
             activeTitle={activeTitle}
             setActiveTitle={setActiveTitle}
           />
+          <button onClick={(e) => handleView(e)} className="pushable">
+            <Link className="front" href="#wrapper">
+              CV VIEW
+            </Link>
+            {/* <span className="front">CV VIEW</span> */}
+          </button>
           {/* <CustomLink
             href="/blog"
             title="Blog"
@@ -217,6 +223,13 @@ const Navbar = () => {
                   &nbsp;
                 </span>
               </Link>
+              <button onClick={(e) => handleView(e)} className="pushable">
+                <Link className="front" href="#wrapper">
+                  CV VIEW
+                </Link>
+                {/* <span className="front">CV VIEW</span> */}
+              </button>
+              <MessageBox/>
               {/* <Link
                 href="/blog"
                 className="flex flex-col justify-center items-center gap-3 cursor-pointer hover:scale-110 relative group"

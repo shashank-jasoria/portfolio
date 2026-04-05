@@ -38,7 +38,6 @@ const singleWord = {
 
 const AnimatedText = ({ title, className }: AnimatedTextProps) => {
   const session = useSession();
-
   console.log(session.data?.user?.email);
   
   return (

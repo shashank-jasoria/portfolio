@@ -1,5 +1,5 @@
 "use client";
-import Image from "next/image";
+// import Image from "next/image";
 import Link from "next/link";
 import { FaLocationArrow } from "react-icons/fa6";
 
@@ -95,7 +95,7 @@ const Projects = () => {
               >
                 <Link href={item.link} target="_blank" className="space-y-5">
                   <div className="relative flex items-center justify-center sm:w-96 w-[80vw] overflow-hidden">
-                    <Image
+                    <img
                       src={item.img}
                       alt="cover"
                       className="rounded-md w-full h-auto"
@@ -125,7 +125,7 @@ const Projects = () => {
                             transform: `translateX(-${5 * index + 2}px)`,
                           }}
                         >
-                          <Image
+                          <img
                             src={icon}
                             alt="icon5"
                             className="p-2"

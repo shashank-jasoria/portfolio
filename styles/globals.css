@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+*{
+  line-height: 1.5;
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -95,7 +99,7 @@
     @apply bg-background text-foreground;
   }
 }
-@media (min-width: 1023px) {
+@media (min-width: 1033px) {
   .about-text_grid {
     grid-column: span 5 / span 5 !important;
   }
@@ -122,12 +126,13 @@
   background-size: cover;
 
   justify-self: center;
-  animation: profile 8s ease-in-out infinite 1s;
+  animation: profile 8s ease-in-out infinite;
 }
 .as-img {
   aspect-ratio: 1;
   object-fit: cover;
   object-position: top;
+  border: 8px solid;
 }
 @keyframes profile {
   0% {
@@ -192,4 +197,59 @@ select,
 *,
 textarea {
   cursor: none !important; /* Force cursor to be hidden */
+}
+.pushable {
+  background: #1b1212;
+  border-radius: 12px;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  outline-offset: 4px;
+  margin-left: 1.5rem;
+}
+
+.front {
+  display: block;
+  padding: 12px 20px;
+  border-radius: 12px;
+  font-size: 1rem;
+  background: #28282b;
+  color: white;
+  transform: translateY(-6px);
+}
+
+.pushable:active .front {
+  transform: translateY(-2px);
+}
+.dark {
+  .pushable {
+    background: #e9dcc9;
+  }
+  .front {
+    background: white;
+    color: black;
+  }
+}
+@media (min-width: 660px) and (max-width: 1033px) {
+  .pushable {
+    width: 50%;
+    margin: 0 auto;
+  }
+  .front {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0px;
+    height: 44px;
+  }
+}
+
+@media (max-width: 660px) {
+  .pushable {
+    width: 100%;
+    margin: 0 auto;
+  }
+  .front {
+    font-size: 0.75rem;
+  }
 }
